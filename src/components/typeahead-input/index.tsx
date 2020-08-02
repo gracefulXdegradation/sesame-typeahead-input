@@ -28,13 +28,14 @@ interface TypeaheadInputProps {
   options: SearchInputItem[]
 }
 
-const highlightSearchMatch = <T extends SearchOutputItem>({value, highlights}: T): JSX.Element => {
+const highlightSearchMatch = <T extends SearchOutputItem>({value, highlight}: T): JSX.Element => {
   return (
-    <div>
-      {value.substring(0, highlights[0].start)}
-      <b>{value.substring(highlights[0].start, highlights[0].start + highlights[0].length)}</b>
-      {value.substring(highlights[0].start + highlights[0].length)}
-    </div>
+    <span dangerouslySetInnerHTML={{
+      __html: value
+        .split('')
+        .reduce((acc, v, i) => acc + (highlight[i] === '1' ? `<b>${v}</b>` : v), '')
+        .replace(/<\/b><b>/g, '')
+    }} />
   )
 }
 

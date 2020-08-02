@@ -1,18 +1,21 @@
 import sortBy from 'lodash/sortBy'
 import groupBy from 'lodash/groupBy'
+import minBy from 'lodash/minBy'
+import maxBy from 'lodash/maxBy'
+import repeat from 'lodash/repeat'
 
 export interface SearchInputItem {
   id: number
   value: string
 }
 
-interface SearchHighlight {
-  start: number
-  length: number
+export interface SearchOutputItem extends SearchInputItem {
+  highlight: string
 }
 
-export interface SearchOutputItem extends SearchInputItem {
-  highlights: SearchHighlight[]
+export interface MatchItem {
+  dist: number
+  highlight: string
 }
 
 const FUZZY_MATCH_THRESHOLD = 3
@@ -24,17 +27,14 @@ export function search<T extends SearchInputItem, K extends SearchOutputItem>(ne
   }
 
   const results = haystick.reduce((acc, item) => {
-    const dist = fuzzyMatch(q, item.value.toLowerCase())
-    if (dist < FUZZY_MATCH_THRESHOLD) {
+    const match = fuzzyMatch(q, item.value.toLowerCase())
+    if (match) {
       const outputItem = {
         ...item,
-        highlights: [{
-          start: 0,
-          length: item.value.length
-        } as SearchHighlight]
+        highlight: match.highlight
       } as unknown as K
 
-      acc.push([outputItem, dist])
+      acc.push([outputItem, match.dist])
     }
     return acc
   }, [] as [K, number][])
@@ -47,32 +47,63 @@ export function search<T extends SearchInputItem, K extends SearchOutputItem>(ne
   return reduced.map((tuple: [K, number]) => tuple[0])
 }
 
-const fuzzyMatch = (query: string, term: string) => {
+export const fuzzyMatch = (query: string, term: string): MatchItem | undefined => {
   const queryPieces = query.split(' ')
   const termPieces = term.split(' ')
   if (queryPieces.length > termPieces.length) {
-    return FUZZY_MATCH_THRESHOLD
+    return
   }
-  const dists = queryPieces.map(q => {
-      return Math.min(...termPieces.map(t =>
-        calculateDist(q, t)
-      ))
+  const matches = queryPieces.map(q => {
+      const queryPieceMatches = termPieces.map((t, i) => {
+        const offset = termPieces.slice(0, i).reduce((off, t) => off + t.length, 0) + i
+        const match = findMatch(q, t)
+        return {
+          ...match,
+          termIndex: i,
+          highlight: match.highlight.padStart(match.highlight.length + offset, '0').padEnd(term.length, '0')
+        }
+      })
+      return minBy(queryPieceMatches, m => m.dist) as MatchItem
     }
   )
 
-  return Math.max(...dists) < FUZZY_MATCH_THRESHOLD ? Math.min(...dists) : FUZZY_MATCH_THRESHOLD
+  const isQueryMatch = (maxBy(matches, m => m.dist) as MatchItem).dist < FUZZY_MATCH_THRESHOLD
+
+  if (isQueryMatch) {
+    return {
+      dist: (minBy(matches, m => m.dist) as MatchItem).dist,
+      highlight: mergeHighlights(matches.map(m => m.highlight), term.length)
+    }
+  }
 }
 
-const calculateDist = (query: string, term: string): number => {
+const findMatch = (query: string, term: string): MatchItem => {
   if (term.startsWith(query)) {
-    return 0
+    return {
+      dist: 0,
+      highlight: highlight(0, query.length, term.length)
+    }
   }
   if (term.endsWith(query)) {
-    return 1
+    return {
+      dist: 1,
+      highlight: highlight(term.indexOf(query), query.length, term.length)
+    }
   }
 
-  return levenshtein(term, query)
+  return {
+    dist: levenshtein(term, query),
+    highlight: highlight(0, term.length, term.length)
+  }
 }
+
+const highlight = (hlStart: number, hlLength: number, wordLength: number): string =>
+  repeat('0', hlStart) + repeat('1', hlLength) + repeat('0', wordLength - hlStart - hlLength)
+
+const mergeHighlights = (hls: string[], length: number): string =>
+  hls.reduce((a, b) => a | parseInt(b, 2), 0)
+    .toString(2)
+    .padStart(length, '0')
 
 export const levenshtein = (a: string, b: string): number => {
   const height = a.length,
