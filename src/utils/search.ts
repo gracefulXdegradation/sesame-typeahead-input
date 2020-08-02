@@ -1,13 +1,23 @@
 import sortBy from 'lodash/sortBy'
 import groupBy from 'lodash/groupBy'
 
-interface SearchInputItem {
+export interface SearchInputItem {
+  id: number
   value: string
+}
+
+interface SearchHighlight {
+  start: number
+  length: number
+}
+
+export interface SearchOutputItem extends SearchInputItem {
+  highlights: SearchHighlight[]
 }
 
 const FUZZY_MATCH_THRESHOLD = 3
 
-export function search<T extends SearchInputItem>(needle: string, haystick: T[]): T[] {
+export function search<T extends SearchInputItem, K extends SearchOutputItem>(needle: string, haystick: T[]): K[] {
   const q = needle.trim().toLowerCase()
   if (q.length < 2) {
     return []
@@ -16,15 +26,25 @@ export function search<T extends SearchInputItem>(needle: string, haystick: T[])
   const results = haystick.reduce((acc, item) => {
     const dist = fuzzyMatch(q, item.value.toLowerCase())
     if (dist < FUZZY_MATCH_THRESHOLD) {
-      acc.push([item, dist])
+      const outputItem = {
+        ...item,
+        highlights: [{
+          start: 0,
+          length: item.value.length
+        } as SearchHighlight]
+      } as unknown as K
+
+      acc.push([outputItem, dist])
     }
     return acc
-  }, [] as [T, number][])
+  }, [] as [K, number][])
 
-  const groupedResults = groupBy(results, (tuple: [T, number]) => tuple[1])
-  return Object.values(groupedResults).reduce((acc, list) => {
-    return [...acc, ...sortBy(list, [(tuple: [T, number]) => tuple[0].value.length])]
-  }, []).map((tuple: [T, number]) => tuple[0])
+  const groupedResults = groupBy(results, (tuple: [T, number]) => tuple[1]) as Record<number, [K, number][]>
+  const reduced = Object.values(groupedResults).reduce(
+    (acc, list) => [...acc, ...sortBy(list, [(tuple: [K, number]) => tuple[0].value.length])],
+    []
+  )
+  return reduced.map((tuple: [K, number]) => tuple[0])
 }
 
 const fuzzyMatch = (query: string, term: string) => {
@@ -55,8 +75,12 @@ const calculateDist = (query: string, term: string): number => {
 }
 
 export const levenshtein = (a: string, b: string): number => {
-  const height = a.length, width = b.length
-  let prevRow: number[] = [], curRow: number[] = [], v: number, h: number
+  const height = a.length,
+    width = b.length
+  let prevRow: number[] = [],
+    curRow: number[] = [],
+    v: number,
+    h: number
   if (!height) return width
   if (!width) return height
   for (h = 0; h <= width; h++) {

@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import styled from 'styled-components'
-import { search } from '../../utils/search'
+import { search, SearchOutputItem, SearchInputItem } from '../../utils/search'
 
 const InputWrapper = styled.div`
   width: 100%;
@@ -22,22 +22,20 @@ const OptionsList = styled.ul`
 
 const MatchItem = styled.span``
 
-const Option = styled.li`
-  
-`
-
-interface InputOption {
-  value: string
-  id: number
-  dist?: number
-}
-
-interface Match extends InputOption {
-  displayValue: any
-}
+const Option = styled.li``
 
 interface TypeaheadInputProps {
-  options: InputOption[]
+  options: SearchInputItem[]
+}
+
+const highlightSearchMatch = <T extends SearchOutputItem>({value, highlights}: T): JSX.Element => {
+  return (
+    <div>
+      {value.substring(0, highlights[0].start)}
+      <b>{value.substring(highlights[0].start, highlights[0].start + highlights[0].length)}</b>
+      {value.substring(highlights[0].start + highlights[0].length)}
+    </div>
+  )
 }
 
 export const TypeaheadInput = (props: TypeaheadInputProps) => {
@@ -56,7 +54,7 @@ export const TypeaheadInput = (props: TypeaheadInputProps) => {
       />
       <OptionsList role="listbox">
         {matches.map((option, i) => (
-          <Option key={option.id}>{option.value}</Option>
+          <Option key={option.id}>{highlightSearchMatch(option)}</Option>
         ))}
       </OptionsList>
     </InputWrapper>
