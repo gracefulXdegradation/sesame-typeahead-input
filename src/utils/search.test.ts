@@ -40,8 +40,8 @@ test('AçAí12 => Açaí', () => {
   expect(doSearch('AçAí12')).toBe('Açaí')
 })
 
-test('cheri => Cherry, Cherimoya, Surinam cherry, Chili pepper', () => {
-  expect(doSearch('cheri')).toBe('Cherry, Cherimoya, Surinam cherry, Chili pepper')
+test('cheri => Cherimoya, Cherry, Chili pepper, Surinam cherry', () => {
+  expect(doSearch('cheri')).toBe('Cherimoya, Cherry, Chili pepper, Surinam cherry')
 })
 
 test('nam c => Surinam cherry', () => {
@@ -56,9 +56,8 @@ test(`l => ''`, () => {
   expect(doSearch('l')).toBe('')
 })
 
-// TODO prioritize Lemon over Japanese plum
-test(`lem => Japanese plum, Lemon, Lime, Plum, Pea`, () => {
-  expect(doSearch('lem')).toBe('Japanese plum, Lemon, Lime, Plum, Pea')
+test(`lem => Lemon, Pea, Lime, Plum, Japanese plum`, () => {
+  expect(doSearch('lem')).toBe('Lemon, Pea, Lime, Plum, Japanese plum')
 })
 
 // TODO Bell pepper looks odd here

@@ -1,4 +1,5 @@
 import sortBy from 'lodash/sortBy'
+import groupBy from 'lodash/groupBy'
 
 interface SearchInputItem {
   value: string
@@ -20,8 +21,10 @@ export function search<T extends SearchInputItem>(needle: string, haystick: T[])
     return acc
   }, [] as [T, number][])
 
-  return sortBy(results, [(tuple: [T, number]) => tuple[1]])
-    .map((tuple: [T, number]) => tuple[0])
+  const groupedResults = groupBy(results, (tuple: [T, number]) => tuple[1])
+  return Object.values(groupedResults).reduce((acc, list) => {
+    return [...acc, ...sortBy(list, [(tuple: [T, number]) => tuple[0].value.length])]
+  }, []).map((tuple: [T, number]) => tuple[0])
 }
 
 const fuzzyMatch = (query: string, term: string) => {
@@ -41,8 +44,11 @@ const fuzzyMatch = (query: string, term: string) => {
 }
 
 const calculateDist = (query: string, term: string): number => {
-  if (term.startsWith(query) || term.endsWith(query)) {
-    return Math.min(term.length - query.length, FUZZY_MATCH_THRESHOLD - 1)
+  if (term.startsWith(query)) {
+    return 0
+  }
+  if (term.endsWith(query)) {
+    return 1
   }
 
   return levenshtein(term, query)
