@@ -2,9 +2,9 @@ import React from 'react'
 import styled from 'styled-components'
 import { TypeaheadInput } from '../typeahead-input'
 import logo from './logo.svg'
-import { yummies } from './yummies'
+import { terms } from '../../utils/terms'
 
-const options = yummies.map((value, i) => ({
+const options = terms.map((value, i) => ({
   id: i,
   value
 }))

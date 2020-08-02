@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import styled from 'styled-components'
-import { fuzzyMatch } from '../../utils/fuzzy-match'
+import { search } from '../../utils/search'
 
 const InputWrapper = styled.div`
   width: 100%;
@@ -45,7 +45,7 @@ export const TypeaheadInput = (props: TypeaheadInputProps) => {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => setPattern(e.target.value)
 
-  const matches = fuzzyMatch(pattern, props.options)
+  const matches = search(pattern, props.options)
 
   return (
     <InputWrapper role="combobox">

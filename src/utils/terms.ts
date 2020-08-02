@@ -1,4 +1,4 @@
-export const yummies = ['Açaí', 'Apple', 'Akee', 'Apricot', 'Avocado', 'Banana', 'Bilberry', 'Blackberry',
+export const terms = ['Açaí', 'Apple', 'Akee', 'Apricot', 'Avocado', 'Banana', 'Bilberry', 'Blackberry',
   'Blackcurrant', 'Black sapote', 'Blueberry', 'Boysenberry', 'Buddha\'s hand',
   'Crab apples', 'Currant', 'Cherry', 'Cherimoya', 'Chico fruit', 'Cloudberry', 'Coconut',
   'Cranberry', 'Cucumber', 'Damson', 'Date', 'Dragonfruit', 'Pitaya', 'Durian',
