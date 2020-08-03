@@ -23,11 +23,13 @@ interface SuggestionListProps {
   suggestions: SearchOutputItem[]
   limit: number
   onSelect: (s: SearchOutputItem) => void
+  onMouseOver: (s: SearchOutputItem) => void
+  onMouseOut: () => void
 }
 
 export const SuggestionList = (props: SuggestionListProps) => {
   const [ highlight, setHighlight ] = useState(-1)
-  const { suggestions, onSelect } = props
+  const { suggestions, onSelect, onMouseOver, onMouseOut } = props
 
   useEffect(() => {
     setHighlight(0)
@@ -44,7 +46,12 @@ export const SuggestionList = (props: SuggestionListProps) => {
       onSelect(suggestions[highlight])
       e.preventDefault()
     }
-  }, [suggestions, onSelect, highlight]);
+  }, [suggestions, onSelect, highlight])
+
+  const highlightWithPreview = useCallback((i: number) => {
+    setHighlight(i)
+    onMouseOver(suggestions[i])
+  }, [onMouseOver, suggestions])
 
   useEffect(() => {
     window.addEventListener('keydown', handleKeyPress)
@@ -54,14 +61,17 @@ export const SuggestionList = (props: SuggestionListProps) => {
   }, [handleKeyPress])
 
   return (
-    <List role="listbox">
+    <List
+      role="listbox"
+      onMouseOut={onMouseOut}
+    >
       {props.suggestions.map((suggestion, i) => (
         <Suggestion
           key={suggestion.id}
           suggestion={suggestion}
           highlighted={i === highlight}
           ind={i}
-          onMouseOver={setHighlight}
+          onMouseOver={highlightWithPreview}
           onSelect={props.onSelect}
         />
       ))}

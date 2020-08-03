@@ -28,6 +28,7 @@ const fetchSuggestions = (pattern: string) => search(pattern, terms)
 
 export const TypeaheadInput = (props: TypeaheadInputProps) => {
   const [value, setValue] = useState('')
+  const [preview, setPreview] = useState('')
   const [pattern, setPattern] = useState('')
   const [suggestions, setSuggestions] = useState([] as SearchOutputItem[])
   const { onValueChange } = props
@@ -39,18 +40,20 @@ export const TypeaheadInput = (props: TypeaheadInputProps) => {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPattern(e.target.value)
     setValue('')
+    setPreview('')
   }
 
   const handleSelect = useCallback((s: SearchOutputItem) => {
     setValue(s.value)
     setPattern('')
+    setPreview('')
     onValueChange(s.value)
   }, [onValueChange])
 
   return (
     <InputWrapper role="combobox">
       <Input
-        value={value || pattern}
+        value={preview || value || pattern}
         type="text"
         placeholder={props.placeholder}
         onChange={handleInputChange}
@@ -59,6 +62,8 @@ export const TypeaheadInput = (props: TypeaheadInputProps) => {
         suggestions={suggestions}
         limit={Math.min(suggestions.length, 5)}
         onSelect={handleSelect}
+        onMouseOver={(s) => setPreview(s.value)}
+        onMouseOut={() => setPreview('')}
       />
     </InputWrapper>
   )
