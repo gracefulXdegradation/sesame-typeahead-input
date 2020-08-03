@@ -11,6 +11,7 @@ const AppWrapper = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+  padding-top: 30vh;
 `
 
 const AppLogo = styled.img`
@@ -18,7 +19,8 @@ const AppLogo = styled.img`
 `
 
 const Form = styled.form`
-  width: 200px;
+  width: 300px;
+  margin-top: 2rem;
 `
 
 export const App = () => {

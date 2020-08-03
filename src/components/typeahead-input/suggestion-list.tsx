@@ -9,11 +9,14 @@ const List = styled.ul`
   position: absolute;
   top: 100%;
   width: 100%;
+  margin-top: .25rem;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   overflow: auto;
   max-height: ${5 * suggestionHeight}px;
+  background: #eee;
+  border-radius: 2px 2px 4px 4px;
 `
 
 interface SuggestionListProps {

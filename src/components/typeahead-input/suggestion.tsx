@@ -11,11 +11,19 @@ const PlainSuggestion = styled.li`
   align-items: center;
   width: 100%;
   border: 1px solid transparent;
+  padding: .5rem;
+  font-size: 1rem;
+  color: #333;
+  letter-spacing: 0.2px;
+
+  em {
+    color: rgb(255, 122, 112);
+    font-style: normal;
+  }
 `
 
 const HighlightedSuggestion = styled(PlainSuggestion)`
-  color: white;
-  border-color: white;
+  background: #ccc;
 `
 
 const formatSuggestion = <T extends SearchOutputItem>({value, highlight}: T): JSX.Element => {
@@ -23,8 +31,8 @@ const formatSuggestion = <T extends SearchOutputItem>({value, highlight}: T): JS
     <span dangerouslySetInnerHTML={{
       __html: value
         .split('')
-        .reduce((acc, v, i) => acc + (highlight[i] === '1' ? `<b>${v}</b>` : v), '')
-        .replace(/<\/b><b>/g, '')
+        .reduce((acc, v, i) => acc + (highlight[i] === '1' ? `<em>${v}</em>` : v), '')
+        .replace(/<\/em><em>/g, '')
     }} />
   )
 }

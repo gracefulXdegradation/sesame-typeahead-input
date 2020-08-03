@@ -11,6 +11,11 @@ const InputWrapper = styled.div`
 
 const Input = styled.input`
   width: 100%;
+  border-radius: .25rem;
+  padding: .5rem;
+  font-size: 1rem;
+  color: #333;
+  letter-spacing: 0.2px;
 `
 
 interface TypeaheadInputProps {
