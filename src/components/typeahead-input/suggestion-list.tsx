@@ -19,10 +19,12 @@ const List = styled.ul`
 interface SuggestionListProps {
   suggestions: SearchOutputItem[]
   limit: number
+  onSelect: (s: SearchOutputItem) => void
 }
 
 export const SuggestionList = (props: SuggestionListProps) => {
-  const [highlight, setHighlight] = useState(-1)
+  const [ highlight, setHighlight ] = useState(-1)
+  const { suggestions, onSelect } = props
 
   useEffect(() => {
     setHighlight(0)
@@ -30,12 +32,16 @@ export const SuggestionList = (props: SuggestionListProps) => {
 
   const handleKeyPress = useCallback(e => {
     if (e.keyCode === 38) {
-      setHighlight(h => !h ? props.suggestions.length - 1 : h - 1)
+      setHighlight(h => !h ? suggestions.length - 1 : h - 1)
     }
     if (e.keyCode === 40) {
-      setHighlight(h => (h + 1) % props.suggestions.length)
+      setHighlight(h => (h + 1) % suggestions.length)
     }
-  }, [props.suggestions]);
+    if (e.keyCode === 13) {
+      onSelect(suggestions[highlight])
+      e.preventDefault()
+    }
+  }, [suggestions, onSelect, highlight]);
 
   useEffect(() => {
     window.addEventListener('keydown', handleKeyPress)
@@ -53,6 +59,7 @@ export const SuggestionList = (props: SuggestionListProps) => {
           highlighted={i === highlight}
           ind={i}
           onMouseOver={setHighlight}
+          onSelect={props.onSelect}
         />
       ))}
     </List>

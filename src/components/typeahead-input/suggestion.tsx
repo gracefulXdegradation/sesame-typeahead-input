@@ -34,6 +34,7 @@ interface SuggestionProps {
   suggestion: SearchOutputItem
   ind: number
   onMouseOver: (i: number) => void
+  onSelect: (s: SearchOutputItem) => void
 }
 
 export const Suggestion = (props: SuggestionProps) => {
@@ -44,10 +45,19 @@ export const Suggestion = (props: SuggestionProps) => {
     [props]
   )
 
+  const handleClick = useCallback(
+    e => props.onSelect(props.suggestion),
+    [props]
+  )
+
   const SuggestionComponent = props.highlighted ? HighlightedSuggestion : PlainSuggestion
 
   return (
-    <SuggestionComponent onMouseEnter={handleMouseOver} onMouseMove={handleMouseOver}>
+    <SuggestionComponent
+      onMouseEnter={handleMouseOver}
+      onMouseMove={handleMouseOver}
+      onClick={handleClick}
+    >
       {content}
     </SuggestionComponent>
   )

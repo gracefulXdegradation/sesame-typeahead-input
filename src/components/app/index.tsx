@@ -28,6 +28,9 @@ export const App = () => {
       <Form>
         <TypeaheadInput
           placeholder="Search"
+          onValueChange={(value: string) => {
+            console.log('Value changed: ', value)
+          }}
         />
       </Form>
     </AppWrapper>
