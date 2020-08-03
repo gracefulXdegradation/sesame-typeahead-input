@@ -1,6 +1,8 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
+import { terms } from '../../utils/terms'
 import styled from 'styled-components'
-import { search } from '../../utils/search'
+import { search, SearchOutputItem } from '../../utils/search'
+import { SuggestionList } from './suggestion-list'
 
 const InputWrapper = styled.div`
   width: 100%;
@@ -9,56 +11,60 @@ const InputWrapper = styled.div`
 
 const Input = styled.input`
   width: 100%;
+  border-radius: .25rem;
+  padding: .5rem;
+  font-size: 1rem;
+  color: #333;
+  letter-spacing: 0.2px;
 `
-
-const OptionsList = styled.ul`
-  position: absolute;
-  top: 100%;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-`
-
-const MatchItem = styled.span``
-
-const Option = styled.li`
-  
-`
-
-interface InputOption {
-  value: string
-  id: number
-  dist?: number
-}
-
-interface Match extends InputOption {
-  displayValue: any
-}
 
 interface TypeaheadInputProps {
-  options: InputOption[]
+  placeholder: string
+  onValueChange: (value: string) => void
 }
 
+// TODO fetch async from server
+const fetchSuggestions = (pattern: string) => search(pattern, terms)
+
 export const TypeaheadInput = (props: TypeaheadInputProps) => {
+  const [value, setValue] = useState('')
+  const [preview, setPreview] = useState('')
   const [pattern, setPattern] = useState('')
+  const [suggestions, setSuggestions] = useState([] as SearchOutputItem[])
+  const { onValueChange } = props
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => setPattern(e.target.value)
+  useEffect(() => {
+    setSuggestions(fetchSuggestions(pattern))
+  }, [pattern])
 
-  const matches = search(pattern, props.options)
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPattern(e.target.value)
+    setValue('')
+    setPreview('')
+  }
+
+  const handleSelect = useCallback((s: SearchOutputItem) => {
+    setValue(s.value)
+    setPattern('')
+    setPreview('')
+    onValueChange(s.value)
+  }, [onValueChange])
 
   return (
     <InputWrapper role="combobox">
       <Input
+        value={preview || value || pattern}
         type="text"
-        placeholder="Yummy"
+        placeholder={props.placeholder}
         onChange={handleInputChange}
       />
-      <OptionsList role="listbox">
-        {matches.map((option, i) => (
-          <Option key={option.id}>{option.value}</Option>
-        ))}
-      </OptionsList>
+      <SuggestionList
+        suggestions={suggestions}
+        limit={Math.min(suggestions.length, 5)}
+        onSelect={handleSelect}
+        onMouseOver={(s) => setPreview(s.value)}
+        onMouseOut={() => setPreview('')}
+      />
     </InputWrapper>
   )
 }

@@ -2,12 +2,6 @@ import React from 'react'
 import styled from 'styled-components'
 import { TypeaheadInput } from '../typeahead-input'
 import logo from './logo.svg'
-import { terms } from '../../utils/terms'
-
-const options = terms.map((value, i) => ({
-  id: i,
-  value
-}))
 
 const AppWrapper = styled.div`
   text-align: center;
@@ -17,6 +11,7 @@ const AppWrapper = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+  padding-top: 30vh;
 `
 
 const AppLogo = styled.img`
@@ -24,7 +19,8 @@ const AppLogo = styled.img`
 `
 
 const Form = styled.form`
-  width: 200px;
+  width: 300px;
+  margin-top: 2rem;
 `
 
 export const App = () => {
@@ -32,7 +28,12 @@ export const App = () => {
     <AppWrapper>
       <AppLogo src={logo} alt="logo" />
       <Form>
-        <TypeaheadInput options={options} />
+        <TypeaheadInput
+          placeholder="Search"
+          onValueChange={(value: string) => {
+            console.log('Value changed: ', value)
+          }}
+        />
       </Form>
     </AppWrapper>
   )
