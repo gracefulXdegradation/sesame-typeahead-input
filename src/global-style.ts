@@ -1,12 +1,9 @@
 import { createGlobalStyle } from 'styled-components'
 
 export const GlobalStyle = createGlobalStyle`
-  @import url(‘https://fonts.googleapis.com/css?family=Montserrat:400,900|Roboto');
+  @import url('https://fonts.googleapis.com/css?family=Roboto');
   * {
     box-sizing: border-box;
-  }
-  *:focus {
-    outline: none;
   }
   body {
     padding: 0;
@@ -23,5 +20,9 @@ export const GlobalStyle = createGlobalStyle`
   }
   li {
     margin: 0;
+  }
+  input {
+    border: none;
+    outline: none;
   }
 `

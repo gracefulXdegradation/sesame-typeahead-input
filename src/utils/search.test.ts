@@ -32,11 +32,8 @@ describe('fuzzy match', () => {
 })
 
 describe('search', () => {
-  const doSearch = (() => {
-    const items = terms.map((value, i) => ({ value, id: i }))
-    return (query: string): string =>
-      search(query, items).map(({ value }) => value).join(', ')
-  })()
+  const doSearch = (query: string): string =>
+      search(query, terms).map(({ value }) => value).join(', ')
 
   test('mango => Mango, Mangosteen, Purple mangosteen', () => {
     expect(doSearch('mango')).toBe('Mango, Mangosteen, Purple mangosteen')

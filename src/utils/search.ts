@@ -39,12 +39,7 @@ export function search<T extends SearchInputItem, K extends SearchOutputItem>(ne
     return acc
   }, [] as [K, number][])
 
-  const groupedResults = groupBy(results, (tuple: [T, number]) => tuple[1]) as Record<number, [K, number][]>
-  const reduced = Object.values(groupedResults).reduce(
-    (acc, list) => [...acc, ...sortBy(list, [(tuple: [K, number]) => tuple[0].value.length])],
-    []
-  )
-  return reduced.map((tuple: [K, number]) => tuple[0])
+  return orderSuggestions(results)
 }
 
 export const fuzzyMatch = (query: string, term: string): MatchItem | undefined => {
@@ -84,6 +79,7 @@ const findMatch = (query: string, term: string): MatchItem => {
       highlight: highlight(0, query.length, term.length)
     }
   }
+  
   if (term.endsWith(query)) {
     return {
       dist: 1,
@@ -104,6 +100,15 @@ const mergeHighlights = (hls: string[], length: number): string =>
   hls.reduce((a, b) => a | parseInt(b, 2), 0)
     .toString(2)
     .padStart(length, '0')
+
+const orderSuggestions = <K extends SearchOutputItem>(suggestions: [K, number][]): K[] => {
+  const grouped = groupBy(suggestions, tuple => tuple[1]) as Record<number, [K, number][]>
+  const reduced = Object.values(grouped).reduce(
+    (acc, list) => [...acc, ...sortBy(list, [tuple => tuple[0].value.length])],
+    []
+  )
+  return reduced.map(tuple => tuple[0])
+}
 
 export const levenshtein = (a: string, b: string): number => {
   const height = a.length,

@@ -1,6 +1,8 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
+import { terms } from '../../utils/terms'
 import styled from 'styled-components'
-import { search, SearchOutputItem, SearchInputItem } from '../../utils/search'
+import { search, SearchOutputItem } from '../../utils/search'
+import { SuggestionList } from './suggestion-list'
 
 const InputWrapper = styled.div`
   width: 100%;
@@ -11,53 +13,34 @@ const Input = styled.input`
   width: 100%;
 `
 
-const OptionsList = styled.ul`
-  position: absolute;
-  top: 100%;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-`
-
-const MatchItem = styled.span``
-
-const Option = styled.li``
-
 interface TypeaheadInputProps {
-  options: SearchInputItem[]
+  placeholder: string
 }
 
-const highlightSearchMatch = <T extends SearchOutputItem>({value, highlight}: T): JSX.Element => {
-  return (
-    <span dangerouslySetInnerHTML={{
-      __html: value
-        .split('')
-        .reduce((acc, v, i) => acc + (highlight[i] === '1' ? `<b>${v}</b>` : v), '')
-        .replace(/<\/b><b>/g, '')
-    }} />
-  )
-}
+// TODO fetch async from server
+const fetchSuggestions = (pattern: string) => search(pattern, terms)
 
 export const TypeaheadInput = (props: TypeaheadInputProps) => {
   const [pattern, setPattern] = useState('')
+  const [suggestions, setSuggestions] = useState([] as SearchOutputItem[])
+
+  useEffect(() => {
+    setSuggestions(fetchSuggestions(pattern))
+  }, [pattern])
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => setPattern(e.target.value)
-
-  const matches = search(pattern, props.options)
 
   return (
     <InputWrapper role="combobox">
       <Input
         type="text"
-        placeholder="Yummy"
+        placeholder={props.placeholder}
         onChange={handleInputChange}
       />
-      <OptionsList role="listbox">
-        {matches.map((option, i) => (
-          <Option key={option.id}>{highlightSearchMatch(option)}</Option>
-        ))}
-      </OptionsList>
+      <SuggestionList
+        suggestions={suggestions}
+        limit={Math.min(suggestions.length, 5)}
+      />
     </InputWrapper>
   )
 }

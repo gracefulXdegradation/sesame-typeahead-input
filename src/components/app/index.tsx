@@ -2,12 +2,6 @@ import React from 'react'
 import styled from 'styled-components'
 import { TypeaheadInput } from '../typeahead-input'
 import logo from './logo.svg'
-import { terms } from '../../utils/terms'
-
-const options = terms.map((value, i) => ({
-  id: i,
-  value
-}))
 
 const AppWrapper = styled.div`
   text-align: center;
@@ -32,7 +26,9 @@ export const App = () => {
     <AppWrapper>
       <AppLogo src={logo} alt="logo" />
       <Form>
-        <TypeaheadInput options={options} />
+        <TypeaheadInput
+          placeholder="Search"
+        />
       </Form>
     </AppWrapper>
   )

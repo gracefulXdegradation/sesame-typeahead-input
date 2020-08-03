@@ -15,3 +15,4 @@ export const terms = ['Açaí', 'Apple', 'Akee', 'Apricot', 'Avocado', 'Banana',
   'Strawberry', 'Surinam cherry', 'Tamarillo', 'Tamarind', 'Ugli fruit', 'White currant',
   'White sapote', 'Yuzu', 'Avocado', 'Bell pepper', 'Chili pepper', 'Corn kernel',
   'Cucumber', 'Eggplant', 'Olive', 'Pea', 'Pumpkin', 'Squash', 'Tomato', 'Zucchini']
+  .map((value, id) => ({ id, value }))
